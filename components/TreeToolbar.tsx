@@ -1,5 +1,5 @@
 import { Crosshair, ZoomIn, ZoomOut } from "lucide-react";
-import BaseToolbar, { BaseToolbarProps } from "./BaseToolbar";
+import BaseToolbar, { type BaseToolbarProps } from "./BaseToolbar";
 
 interface TreeToolbarProps extends BaseToolbarProps {
   scale: number;

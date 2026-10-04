@@ -1,6 +1,6 @@
 "use client";
 
-import MemberDetailContent from "@/components/MemberDetailContent";
+import MemberDetailContent from "@/context/MemberDetailContent";
 import MemberForm from "@/components/MemberForm";
 import { Person } from "@/types";
 import { AnimatePresence, motion } from "framer-motion";
@@ -8,8 +8,8 @@ import { AlertCircle, ArrowLeft, Edit2, ExternalLink, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { useDashboard } from "./DashboardContext";
-import { useUser } from "./UserProvider";
+import { useMemberListView } from "@/context/MemberListContext";
+import { useUser } from "@/components/UserProvider";
 
 export default function MemberDetailModal() {
   const {
@@ -17,7 +17,7 @@ export default function MemberDetailModal() {
     setMemberModalId,
     showCreateMember,
     setShowCreateMember,
-  } = useDashboard();
+  } = useMemberListView();
   const { isAdmin, isEditor: canEdit, supabase } = useUser();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);

@@ -3,7 +3,7 @@
 import { Person } from "@/types";
 import { getAvatarBg } from "@/utils/styleHelprs";
 import Image from "next/image";
-import { useDashboard } from "./DashboardContext";
+import { useMemberListView } from "@/context/MemberListContext";
 import DefaultAvatar from "./DefaultAvatar";
 
 interface FamilyNodeCardProps {
@@ -24,7 +24,7 @@ export default function FamilyNodeCard({
   isRingVisible = false,
   isPlusVisible = false,
 }: FamilyNodeCardProps) {
-  const { showAvatar, setMemberModalId } = useDashboard();
+  const { showAvatar, setMemberModalId } = useMemberListView();
 
   const isDeceased = person.is_deceased;
 
@@ -102,10 +102,10 @@ export default function FamilyNodeCard({
           {showAvatar
             ? person.full_name
             : person.full_name.split(" ").map((word, i) => (
-                <span key={i} className="block">
-                  {word}
-                </span>
-              ))}
+              <span key={i} className="block">
+                {word}
+              </span>
+            ))}
         </div>
       </div>
     </div>

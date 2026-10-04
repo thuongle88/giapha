@@ -1,6 +1,6 @@
-import { DashboardProvider } from "@/components/DashboardContext";
+import { MemberListProvider } from "@/context/MemberListContext";
 import EventsList from "@/components/EventsList";
-import MemberDetailModal from "@/components/MemberDetailModal";
+import MemberDetailModal from "@/components/modal/MemberDetailModal";
 import { getSupabase } from "@/utils/supabase/queries";
 
 export const metadata = {
@@ -25,7 +25,7 @@ export default async function EventsPage() {
   const customEvents = customEventsRes.data || [];
 
   return (
-    <DashboardProvider>
+    <MemberListProvider>
       <div className="flex-1 w-full relative flex flex-col pb-12">
         <div className="w-full relative z-20 py-6 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto">
           <h1 className="title">Sự kiện gia phả</h1>
@@ -44,6 +44,6 @@ export default async function EventsPage() {
 
       {/* Modal for member details when clicking an event card */}
       <MemberDetailModal />
-    </DashboardProvider>
+    </MemberListProvider>
   );
 }

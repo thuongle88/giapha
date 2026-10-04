@@ -1,11 +1,12 @@
 "use client";
 
-import { useDashboard } from "@/components/DashboardContext";
-import DashboardMemberList from "@/components/DashboardMemberList";
+import { useMemberListView } from "@/context/MemberListContext";
+import MemberList from "@/components/MemberList";
 import RootSelector from "@/components/RootSelector";
 import { Person, Relationship } from "@/types";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import dynamic from "next/dynamic";
+import { useSearchParams } from "next/navigation";
 
 const FamilyTree = dynamic(() => import("@/components/FamilyTree"));
 const MindmapTree = dynamic(() => import("@/components/MindmapTree"));
@@ -24,18 +25,20 @@ const BubbleMapTree = dynamic(
   { ssr: false },
 );
 
-interface DashboardViewsProps {
+interface MembersViewsProps {
   persons: Person[];
   relationships: Relationship[];
   canEdit?: boolean;
 }
 
-export default function DashboardViews({
+export default function MembersViews({
   persons,
   relationships,
   canEdit = false,
-}: DashboardViewsProps) {
-  const { view: currentView, rootId } = useDashboard();
+}: MembersViewsProps) {
+  const { view: currentView, rootId, setView, setRootId } = useMemberListView();
+  const searchParams = useSearchParams();
+  const hasRestored = useRef(false);
 
   // Prepare map and roots for tree views
   const { personsMap, roots, defaultRootId } = useMemo(() => {
@@ -87,6 +90,43 @@ export default function DashboardViews({
 
   const activeRootId = rootId || defaultRootId;
 
+  // Khôi phục lựa chọn từ localStorage
+  useEffect(() => {
+    if (hasRestored.current) return;
+
+    const urlRootId = searchParams.get("rootId");
+
+    if (!urlRootId) {
+      try {
+        const savedRootId = localStorage.getItem("members_rootId");
+
+        if (!urlRootId && savedRootId && savedRootId !== rootId) {
+          setRootId(savedRootId);
+        }
+      } catch (e) {
+        console.warn("Failed to read from localStorage:", e);
+      }
+    }
+
+    hasRestored.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Lưu lựa chọn vào localStorage
+  useEffect(() => {
+    if (!hasRestored.current) return;
+
+    const timeout = setTimeout(() => {
+      try {
+        if (activeRootId) localStorage.setItem("members_rootId", activeRootId);
+      } catch (e) {
+        console.warn("Failed to write to localStorage:", e);
+      }
+    }, 100);
+
+    return () => clearTimeout(timeout);
+  }, [currentView, activeRootId]);
+
   return (
     <>
       <main className="flex-1 overflow-auto bg-stone-50/50 flex flex-col">
@@ -102,7 +142,7 @@ export default function DashboardViews({
 
         {currentView === "list" && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full relative z-10">
-            <DashboardMemberList
+            <MemberList
               initialPersons={persons}
               relationships={relationships}
               canEdit={canEdit}

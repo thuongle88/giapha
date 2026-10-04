@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Filter } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { useDashboard } from "./DashboardContext";
+import { useMemberListView } from "@/context/MemberListContext";
 import ExportButton from "./ExportButton";
 
 export interface BaseToolbarProps {
@@ -48,7 +48,7 @@ export default function BaseToolbar({
   canEdit,
   children,
 }: BaseToolbarProps) {
-  const { showAvatar, setShowAvatar } = useDashboard();
+  const { showAvatar, setShowAvatar } = useMemberListView();
   const [showFilters, setShowFilters] = useState(false);
   const filtersRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
@@ -92,11 +92,10 @@ export default function BaseToolbar({
       <div className="relative">
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className={`flex items-center gap-2 px-4 h-10 rounded-full font-semibold text-sm shadow-sm border transition-all duration-300 ${
-            showFilters
-              ? "bg-amber-100/90 text-amber-800 border-amber-200"
-              : "bg-white/80 text-stone-600 border-stone-200/60 hover:bg-white hover:text-stone-900 hover:shadow-md backdrop-blur-md"
-          }`}
+          className={`flex items-center gap-2 px-4 h-10 rounded-full font-semibold text-sm shadow-sm border transition-all duration-300 ${showFilters
+            ? "bg-amber-100/90 text-amber-800 border-amber-200"
+            : "bg-white/80 text-stone-600 border-stone-200/60 hover:bg-white hover:text-stone-900 hover:shadow-md backdrop-blur-md"
+            }`}
         >
           <Filter className="size-4" />
           <span className="hidden sm:inline">Hiển thị</span>

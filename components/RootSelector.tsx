@@ -1,7 +1,7 @@
 "use client";
 
 import { Person } from "@/types";
-import { useDashboard } from "./DashboardContext";
+import { useMemberListView } from "@/context/MemberListContext";
 import PersonSelector from "./PersonSelector";
 
 export default function RootSelector({
@@ -11,7 +11,7 @@ export default function RootSelector({
   persons: Person[];
   currentRootId: string;
 }) {
-  const { setRootId } = useDashboard();
+  const { setRootId } = useMemberListView();
 
   return (
     <PersonSelector

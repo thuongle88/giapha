@@ -1,5 +1,5 @@
 import { ChevronsDownUp, ChevronsUpDown } from "lucide-react";
-import BaseToolbar, { BaseToolbarProps } from "./BaseToolbar";
+import BaseToolbar, { type BaseToolbarProps } from "./BaseToolbar";
 
 interface MindmapToolbarProps extends BaseToolbarProps {
   setExpandSignal: (val: { type: "expand" | "collapse"; ts: number }) => void;

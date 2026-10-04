@@ -11,7 +11,7 @@ import React, {
 import { usePanZoom } from "@/hooks/usePanZoom";
 import { Person, Relationship } from "@/types";
 import { Minus, Plus } from "lucide-react";
-import { useDashboard } from "./DashboardContext";
+import { useMemberListView } from "@/context/MemberListContext";
 import FamilyNodeCard from "./FamilyNodeCard";
 import TreeToolbar from "./TreeToolbar";
 
@@ -45,7 +45,7 @@ export default function FamilyTree({
     DEFAULT_AUTO_COLLAPSE_LEVEL,
   );
 
-  const { showAvatar } = useDashboard();
+  const { showAvatar } = useMemberListView();
 
   const {
     scale,

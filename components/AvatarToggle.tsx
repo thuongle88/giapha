@@ -1,10 +1,10 @@
 "use client";
 
 import { Eye, EyeOff } from "lucide-react";
-import { useDashboard } from "./DashboardContext";
+import { useMemberListView } from "@/context/MemberListContext";
 
 export default function AvatarToggle() {
-  const { showAvatar, setShowAvatar } = useDashboard();
+  const { showAvatar, setShowAvatar } = useMemberListView();
 
   const toggleAvatar = () => {
     setShowAvatar(!showAvatar);

@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import DefaultAvatar from "./DefaultAvatar";
 import { FemaleIcon, MaleIcon } from "./GenderIcons";
 
@@ -83,11 +83,10 @@ function PersonSelector({
       </p>
       <button
         onClick={() => setOpen((v) => !v)}
-        className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border text-left transition-all ${
-          selected
-            ? "bg-amber-50 border-amber-300 text-stone-800"
-            : "bg-white/80 border-stone-200 text-stone-400 hover:border-amber-200"
-        }`}
+        className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border text-left transition-all ${selected
+          ? "bg-amber-50 border-amber-300 text-stone-800"
+          : "bg-white/80 border-stone-200 text-stone-400 hover:border-amber-200"
+          }`}
       >
         <div className="relative shrink-0">
           <div
@@ -268,6 +267,28 @@ const KINSHIP_TERMS = [
   },
 ];
 
+// ── Regional kinship terms ────────────────────────────────────────────────────
+type RegionalTerm = {
+  reference: string;
+  other: string;
+};
+
+const REGIONAL_TERMS: RegionalTerm[] = [
+  { reference: "Bố", other: "ba, tía, thầy, bọ" },
+  { reference: "Mẹ", other: "má, mạ, u, bu, bầm" },
+  { reference: "Ông (nội / ngoại)", other: "ôn" },
+  { reference: "Bà (nội / ngoại)", other: "mệ" },
+  { reference: "Anh trai", other: "eng, anh hai" },
+  { reference: "Chị gái", other: "chị hai" },
+  { reference: "Em", other: "mi, út" },
+  { reference: "Bác gái (vợ bác)", other: "bác" },
+  { reference: "Cô (em gái bố)", other: "o" },
+  { reference: "Thím (vợ chú)", other: "mự" },
+  { reference: "Con rể", other: "rể" },
+  { reference: "Con dâu", other: "dâu" },
+  { reference: "Thông gia", other: "sui gia" },
+];
+
 // ── Main component ────────────────────────────────────────────────────────────
 export default function KinshipFinder({ persons, relationships }: Props) {
   const router = useRouter();
@@ -276,6 +297,36 @@ export default function KinshipFinder({ persons, relationships }: Props) {
 
   const p1Id = searchParams.get("p1");
   const p2Id = searchParams.get("p2");
+
+  useEffect(() => {
+    if (!p1Id && !p2Id) {
+      try {
+        const savedP1 = localStorage.getItem("kinship_p1");
+        const savedP2 = localStorage.getItem("kinship_p2");
+        if (savedP1 || savedP2) {
+          const params = new URLSearchParams(searchParams.toString());
+          if (savedP1) params.set("p1", savedP1);
+          if (savedP2) params.set("p2", savedP2);
+          router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+        }
+      } catch (e) {
+        console.warn("Failed to read from localStorage:", e);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    try {
+      if (p1Id) localStorage.setItem("kinship_p1", p1Id);
+      else localStorage.removeItem("kinship_p1");
+      
+      if (p2Id) localStorage.setItem("kinship_p2", p2Id);
+      else localStorage.removeItem("kinship_p2");
+    } catch (e) {
+      console.warn("Failed to write to localStorage:", e);
+    }
+  }, [p1Id, p2Id]);
 
   const personA = useMemo(
     () => persons.find((p) => p.id === p1Id) || null,
@@ -287,6 +338,8 @@ export default function KinshipFinder({ persons, relationships }: Props) {
   );
 
   const [showGuide, setShowGuide] = useState(false);
+  const [showReference, setShowReference] = useState(false);
+  const [showRegional, setShowRegional] = useState(false);
 
   const updateUrl = (p1Id: string | null, p2Id: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -436,35 +489,70 @@ export default function KinshipFinder({ persons, relationships }: Props) {
             {/* Disclaimer for ambiguous terms */}
             {(result.aCallsB.includes("/") ||
               result.aCallsB.includes("họ hàng")) && (
-              <p className="text-xs text-stone-400 italic px-1">
-                * Danh xưng chính xác dựa trên giới tính, thứ tự sinh của các
-                nhánh và vế Nội/Ngoại.
-              </p>
-            )}
+                <p className="text-xs text-stone-400 italic px-1">
+                  * Danh xưng chính xác dựa trên giới tính, thứ tự sinh của các
+                  nhánh và vế Nội/Ngoại.
+                </p>
+              )}
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* ── Guide & reference section ── */}
       <div className="border-t border-stone-200/60 pt-6 space-y-4">
-        <button
-          onClick={() => setShowGuide((v) => !v)}
-          className="flex items-center gap-2 text-sm font-semibold text-stone-500 hover:text-amber-600 transition-colors"
-        >
-          <BookOpen className="size-4" />
-          {showGuide ? "Ẩn hướng dẫn" : "Hướng dẫn sử dụng & Bảng danh xưng"}
-        </button>
+        <div className="flex flex-wrap items-center gap-6">
+          <button
+            onClick={() => {
+              setShowGuide((v) => !v);
+              if (!showGuide) {
+                setShowReference(false);
+                setShowRegional(false);
+              }
+            }}
+            className={`flex items-center gap-2 text-sm font-semibold transition-colors ${showGuide ? "text-amber-600" : "text-stone-500 hover:text-amber-600"}`}
+          >
+            <Info className="size-4" />
+            Hướng dẫn sử dụng
+          </button>
+          <button
+            onClick={() => {
+              setShowReference((v) => !v);
+              if (!showReference) {
+                setShowGuide(false);
+                setShowRegional(false);
+              }
+            }}
+            className={`flex items-center gap-2 text-sm font-semibold transition-colors ${showReference ? "text-amber-600" : "text-stone-500 hover:text-amber-600"}`}
+          >
+            <BookOpen className="size-4" />
+            Bảng danh xưng
+          </button>
+          <button
+            onClick={() => {
+              setShowRegional((v) => !v);
+              if (!showRegional) {
+                setShowGuide(false);
+                setShowReference(false);
+              }
+            }}
+            className={`flex items-center gap-2 text-sm font-semibold transition-colors ${showRegional ? "text-amber-600" : "text-stone-500 hover:text-amber-600"}`}
+          >
+            <ArrowLeftRight className="size-4" />
+            Danh xưng 3 miền
+          </button>
+        </div>
 
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {showGuide && (
             <motion.div
+              key="guide"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.25 }}
               className="overflow-hidden"
             >
-              <div className="space-y-5">
+              <div className="space-y-5 pb-2">
                 {/* How it works */}
                 <div className="bg-blue-50/60 border border-blue-100 rounded-2xl p-5">
                   <p className="text-sm font-bold text-blue-700 flex items-center gap-2 mb-3">
@@ -525,7 +613,20 @@ export default function KinshipFinder({ persons, relationships }: Props) {
                     </li>
                   </ul>
                 </div>
+              </div>
+            </motion.div>
+          )}
 
+          {showReference && (
+            <motion.div
+              key="reference"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25 }}
+              className="overflow-hidden"
+            >
+              <div className="space-y-5 pb-2">
                 {/* Reference table */}
                 <div className="bg-white/80 border border-stone-200/60 rounded-2xl overflow-hidden">
                   <div className="px-5 py-3 border-b border-stone-100 bg-stone-50/50">
@@ -550,6 +651,60 @@ export default function KinshipFinder({ persons, relationships }: Props) {
                         </div>
                       </div>
                     ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {showRegional && (
+            <motion.div
+              key="regional"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25 }}
+              className="overflow-hidden"
+            >
+              <div className="space-y-5 pb-2">
+                {/* Regional Reference table */}
+                <div className="bg-white/80 border border-stone-200/60 rounded-2xl overflow-hidden">
+                  <div className="px-5 py-3 border-b border-stone-100 bg-stone-50/50">
+                    <p className="text-sm font-bold text-stone-600">
+                      Quy đổi danh xưng ba miền Bắc - Trung - Nam
+                    </p>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left">
+                      <thead className="bg-stone-50/30 text-stone-500 text-xs uppercase tracking-wider border-b border-stone-100">
+                        <tr>
+                          <th className="px-5 py-3 font-semibold text-emerald-700 w-1/2 border-r border-stone-100">Tham Chiếu</th>
+                          <th className="px-5 py-3 font-semibold text-amber-700 w-1/2">Cách gọi khác</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-stone-100">
+                        {REGIONAL_TERMS.map((row, i) => (
+                          <tr key={i} className="hover:bg-stone-50/50 transition-colors">
+                            <td className="px-5 py-3 font-bold text-stone-700 capitalize border-r border-stone-100/50">{row.reference}</td>
+                            <td className="px-5 py-3 text-stone-600 capitalize">{row.other}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Fun facts */}
+                <div className="bg-blue-50/60 border border-blue-100 rounded-2xl p-5">
+                  <p className="text-sm font-bold text-blue-700 flex items-center gap-2 mb-4">
+                    <Info className="size-4" />
+                    Một số lưu ý thú vị
+                  </p>
+                  <div className="mt-5 pt-4 border-t border-blue-200/50">
+                    <p className="font-bold text-blue-900">Hệ thống xưng hô Việt rất "vai vế"</p>
+                    <p className="mt-2 leading-relaxed">
+                      Tiếng Việt không chỉ phân biệt <strong>tuổi, giới tính, bên nội/ngoại</strong> mà còn phân biệt <strong>thứ bậc trong gia đình, lớn/nhỏ hơn cha mẹ, quan hệ qua hôn nhân</strong>. Nên đây là một trong những hệ thống danh xưng phức tạp nhất châu Á.
+                    </p>
                   </div>
                 </div>
               </div>

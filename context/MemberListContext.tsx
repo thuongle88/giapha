@@ -1,10 +1,10 @@
 "use client";
 
+import { ViewMode } from "@/components/ViewToggle";
 import { useSearchParams } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
-import { ViewMode } from "./ViewToggle";
 
-interface DashboardState {
+interface MemberListViewState {
   memberModalId: string | null;
   setMemberModalId: (id: string | null) => void;
   showCreateMember: boolean;
@@ -17,11 +17,11 @@ interface DashboardState {
   setRootId: (id: string | null) => void;
 }
 
-export const DashboardContext = createContext<DashboardState | undefined>(
+export const MemberListContext = createContext<MemberListViewState | undefined>(
   undefined,
 );
 
-export function DashboardProvider({
+export function MemberListProvider({
   children,
   initialView,
   initialRootId,
@@ -122,7 +122,7 @@ export function DashboardProvider({
   };
 
   return (
-    <DashboardContext.Provider
+    <MemberListContext.Provider
       value={{
         memberModalId,
         setMemberModalId: updateModalId,
@@ -137,26 +137,26 @@ export function DashboardProvider({
       }}
     >
       {children}
-    </DashboardContext.Provider>
+    </MemberListContext.Provider>
   );
 }
 
-export function useDashboard(): DashboardState {
-  const context = useContext(DashboardContext);
-  // Return a safe no-op fallback when used outside DashboardProvider
+export function useMemberListView(): MemberListViewState {
+  const context = useContext(MemberListContext);
+  // Return a safe no-op fallback when used outside MemberListProvider
   // (e.g., on the /dashboard/members/[id] standalone page)
   if (context === undefined) {
     return {
       memberModalId: null,
-      setMemberModalId: () => {},
+      setMemberModalId: () => { },
       showCreateMember: false,
-      setShowCreateMember: () => {},
+      setShowCreateMember: () => { },
       showAvatar: true,
-      setShowAvatar: () => {},
+      setShowAvatar: () => { },
       view: "list",
-      setView: () => {},
+      setView: () => { },
       rootId: null,
-      setRootId: () => {},
+      setRootId: () => { },
     };
   }
   return context;

@@ -1,6 +1,6 @@
-import { DashboardProvider } from "@/components/DashboardContext";
-import DashboardViews from "@/components/DashboardViews";
-import MemberDetailModal from "@/components/MemberDetailModal";
+import { MemberListProvider } from "@/context/MemberListContext";
+import MembersViews from "@/components/MembersViews";
+import MemberDetailModal from "@/components/modal/MemberDetailModal";
 import ViewToggle from "@/components/ViewToggle";
 import { getProfile, getSupabase } from "@/utils/supabase/queries";
 
@@ -59,19 +59,19 @@ export default async function FamilyTreePage({ searchParams }: PageProps) {
   }
 
   return (
-    <DashboardProvider
+    <MemberListProvider
       initialView={initialView}
       initialRootId={finalRootId}
       initialShowAvatar={initialShowAvatar}
     >
       <ViewToggle />
-      <DashboardViews
+      <MembersViews
         persons={persons}
         relationships={relationships}
         canEdit={canEdit}
       />
 
       <MemberDetailModal />
-    </DashboardProvider>
+    </MemberListProvider>
   );
 }

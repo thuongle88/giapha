@@ -20,8 +20,8 @@ import {
 import { Solar } from "lunar-javascript";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import CustomEventModal from "./CustomEventModal";
-import { useDashboard } from "./DashboardContext";
+import CustomEventModal from "@/components/modal/CustomEventModal";
+import { useMemberListView } from "@/context/MemberListContext";
 
 interface EventsListProps {
   persons: {
@@ -75,7 +75,7 @@ function EventCard({
   const isPast = event.daysUntil < 0;
   const isSoon = event.daysUntil > 0 && event.daysUntil <= 7;
 
-  const { setMemberModalId } = useDashboard();
+  const { setMemberModalId } = useMemberListView();
 
   const handleClick = () => {
     if (isCustom) {
@@ -128,31 +128,29 @@ function EventCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: index * 0.04 }}
       onClick={handleClick}
-      className={`w-full text-left flex items-start gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer active:scale-[0.98] hover:shadow-md group ${
-        isToday
-          ? "bg-amber-50 border-amber-300 shadow-sm"
-          : isPast
-            ? "bg-stone-50/60 border-stone-200/50"
-            : isBirthday
-              ? "bg-white/80 border-stone-200/60 hover:border-blue-200"
-              : isCustom
-                ? "bg-white/80 border-stone-200/60 hover:border-purple-200"
-                : "bg-white/80 border-stone-200/60 hover:border-rose-200"
-      }`}
+      className={`w-full text-left flex items-start gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer active:scale-[0.98] hover:shadow-md group ${isToday
+        ? "bg-amber-50 border-amber-300 shadow-sm"
+        : isPast
+          ? "bg-stone-50/60 border-stone-200/50"
+          : isBirthday
+            ? "bg-white/80 border-stone-200/60 hover:border-blue-200"
+            : isCustom
+              ? "bg-white/80 border-stone-200/60 hover:border-purple-200"
+              : "bg-white/80 border-stone-200/60 hover:border-rose-200"
+        }`}
     >
       {/* Icon */}
       <div
-        className={`shrink-0 size-10 sm:size-11 flex items-center justify-center rounded-xl ${
-          isToday
-            ? "bg-amber-100 text-amber-600"
-            : isPast
-              ? "bg-stone-100 text-stone-400"
-              : isBirthday
-                ? "bg-blue-50 text-blue-500"
-                : isCustom
-                  ? "bg-purple-50 text-purple-500"
-                  : "bg-rose-50 text-rose-500"
-        }`}
+        className={`shrink-0 size-10 sm:size-11 flex items-center justify-center rounded-xl ${isToday
+          ? "bg-amber-100 text-amber-600"
+          : isPast
+            ? "bg-stone-100 text-stone-400"
+            : isBirthday
+              ? "bg-blue-50 text-blue-500"
+              : isCustom
+                ? "bg-purple-50 text-purple-500"
+                : "bg-rose-50 text-rose-500"
+          }`}
       >
         {isBirthday ? (
           <Cake className="size-[18px] sm:size-5" />
@@ -168,11 +166,10 @@ function EventCard({
         {/* Top row: name + badge */}
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <p
-            className={`font-semibold text-[15px] sm:text-base truncate transition-colors ${
-              isPast
-                ? "text-stone-500"
-                : "text-stone-800 group-hover:text-amber-700"
-            }`}
+            className={`font-semibold text-[15px] sm:text-base truncate transition-colors ${isPast
+              ? "text-stone-500"
+              : "text-stone-800 group-hover:text-amber-700"
+              }`}
           >
             {event.personName}
           </p>
@@ -186,15 +183,14 @@ function EventCard({
             )}
           {/* Days badge — inline with name */}
           <span
-            className={`shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold leading-tight whitespace-nowrap ${
-              isToday
-                ? "bg-amber-400 text-white"
-                : isPast
-                  ? "bg-stone-200/80 text-stone-500"
-                  : isSoon
-                    ? "bg-red-100 text-red-600"
-                    : "bg-stone-100 text-stone-500"
-            }`}
+            className={`shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold leading-tight whitespace-nowrap ${isToday
+              ? "bg-amber-400 text-white"
+              : isPast
+                ? "bg-stone-200/80 text-stone-500"
+                : isSoon
+                  ? "bg-red-100 text-red-600"
+                  : "bg-stone-100 text-stone-500"
+              }`}
           >
             {isToday && (
               <span className="relative flex size-1.5">
@@ -409,13 +405,12 @@ export default function EventsList({
                 setFilter(tab.key);
                 setShowCount(20);
               }}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
-                filter === tab.key
-                  ? filter === "past"
-                    ? "bg-stone-600 text-white shadow-sm"
-                    : "bg-amber-500 text-white shadow-sm"
-                  : "bg-white/80 text-stone-600 border border-stone-200/60 hover:border-amber-200 hover:text-amber-700"
-              }`}
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${filter === tab.key
+                ? filter === "past"
+                  ? "bg-stone-600 text-white shadow-sm"
+                  : "bg-amber-500 text-white shadow-sm"
+                : "bg-white/80 text-stone-600 border border-stone-200/60 hover:border-amber-200 hover:text-amber-700"
+                }`}
             >
               {tab.label}
             </button>

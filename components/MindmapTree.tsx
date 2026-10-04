@@ -3,7 +3,7 @@
 import { Person, Relationship } from "@/types";
 import { Share2 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useDashboard } from "./DashboardContext";
+import { useMemberListView } from "@/context/MemberListContext";
 import { MindmapContextData, MindmapNode } from "./MindmapNode";
 import MindmapToolbar from "./MindmapToolbar";
 
@@ -24,7 +24,7 @@ export default function MindmapTree({
   roots,
   canEdit,
 }: MindmapTreeProps) {
-  const { showAvatar, setMemberModalId } = useDashboard();
+  const { showAvatar, setMemberModalId } = useMemberListView();
   const [hideDaughtersInLaw, setHideDaughtersInLaw] = useState(false);
   const [hideSonsInLaw, setHideSonsInLaw] = useState(false);
   const [hideDaughters, setHideDaughters] = useState(false);

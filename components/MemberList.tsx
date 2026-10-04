@@ -4,9 +4,9 @@ import PersonCard from "@/components/PersonCard";
 import { Person, Relationship } from "@/types";
 import { ArrowUpDown, Filter, Plus, Search } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useDashboard } from "./DashboardContext";
+import { useMemberListView } from "@/context/MemberListContext";
 
-export default function DashboardMemberList({
+export default function MemberList({
   initialPersons,
   relationships = [],
   canEdit = false,
@@ -15,7 +15,7 @@ export default function DashboardMemberList({
   relationships?: Relationship[];
   canEdit?: boolean;
 }) {
-  const { setShowCreateMember } = useDashboard();
+  const { setShowCreateMember } = useMemberListView();
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOption, setSortOption] = useState("generation_asc");
 
